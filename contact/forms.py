@@ -51,9 +51,14 @@ class ContactForm(forms.ModelForm):
             )
 
         return first_name
-    
+
+
 class RegisterForm(UserCreationForm):
     first_name = forms.CharField(
+        required=True,
+        min_length=3,
+    )
+    last_name = forms.CharField(
         required=True,
         min_length=3,
     )
@@ -66,11 +71,13 @@ class RegisterForm(UserCreationForm):
             'username', 'password1', 'password2',
         )
 
-        def clean_email(self):
-            email = self.cleaned_data.get('email')
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
 
-            if User.objects.filter(email=email).exists():
-                self.add_error('email', ValidationError('This email already exist.',
-                code='invalid'))
+        if User.objects.filter(email=email).exists():
+            self.add_error(
+                'email',
+                ValidationError('Já existe este e-mail', code='invalid')
+            )
 
-                return email
+        return email
